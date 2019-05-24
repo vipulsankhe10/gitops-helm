@@ -1,22 +1,23 @@
-apiVersion: v1
-kind: Service
+kind: "Service"
+apiVersion: "v1"
 metadata:
-  name: {{ .Release.Name }}
+  name: "falkonry-data-services"
   labels:
-    app: {{ template "podinfo.name" . }}
-    chart: {{ template "podinfo.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    function: "data-services"
+    party: "falkonry"
 spec:
-  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.externalPort }}
-      targetPort: http
+    - name: data-services
+      port: 8443
       protocol: TCP
-      name: http
-      {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.nodePort))) }}
-      nodePort: {{ .Values.service.nodePort }}
-      {{- end }}
+      targetPort: 8443
+    - name: data-services-http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+    - name: data-services-ws
+      port: 8444
+      targetPort: 8444
+      protocol: TCP
   selector:
-    app: {{ template "podinfo.name" . }}
-    release: {{ .Release.Name }}
+    name: "falkonry-data-services"

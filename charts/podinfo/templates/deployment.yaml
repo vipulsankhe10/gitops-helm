@@ -1,68 +1,114 @@
-apiVersion: apps/v1beta2
-kind: Deployment
+kind: "Deployment"
+apiVersion: "extensions/v1beta1"
 metadata:
-  name: {{ .Release.Name }}
+  name: "falkonry-data-services"
   labels:
-    app: {{ template "podinfo.name" . }}
-    chart: {{ template "podinfo.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    function: "data-services"
+    party: "falkonry"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "podinfo.name" . }}
-      release: {{ .Release.Name }}
+      name: "falkonry-data-services"
   template:
     metadata:
       labels:
-        app: {{ template "podinfo.name" . }}
-        release: {{ .Release.Name }}
-      annotations:
-        prometheus.io/scrape: 'true'
+        function: "data-services"
+        name: "falkonry-data-services"
     spec:
+      imagePullSecrets:
+        -
+          name: "falkonry"
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image }}"
-          imagePullPolicy: {{ .Values.imagePullPolicy }}
+        -
+          name: "data-services"
+          image: quay.io/falkonry/barbary:master.latest
           command:
-            - ./podinfo
-            - -port={{ .Values.service.containerPort }}
-            {{- if .Values.logLevel }}
-            - -debug=true
-            {{- end }}
-          env:
-          - name: backend_url
-            value: {{ .Values.backend }}
+            - "sh"
+            - "/riactor/Run.sh"
           ports:
-            - name: http
-              containerPort: {{ .Values.service.containerPort }}
-              protocol: TCP
+            -
+              containerPort: 8000
+              protocol: "TCP"
+          env:
+            - name: "falkonry_installationId"
+              value: "lololollol"
+            -
+              name: "falkonry_tercel_riactor_memory"
+              value: "9g"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_learn_image"
+              value: "<learn-image-repo>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_apply_image"
+              value: "<apply-image-repo>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_live_image"
+              value: "<live-image-repo>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_explanationreport_image"
+              value: "<explanationreport-image-repo>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_image_image"
+              value: "<edgebuilder-image-repo>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_datapersist_image"
+              value: "<datapersist-image-repo>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_learn_version_current"
+              value: "<learn-current-version-ds>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_learn_version_previous"
+              value: "<learn-previous-version-ds>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_apply_version_current"
+              value: "<apply-current-version-ds>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_apply_version_previous"
+              value: "<apply-previous-version-ds>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_live_version_current"
+              value: "<live-current-version-ds>"
+            -
+              name: "falkonry_tercel_riactor_process_kubernetes_live_version_previous"
+              value: "<live-previous-version-ds>"
+            - 
+              name: "falkonry_tercel_riactor_process_kubernetes_image_version_current"
+              value: "<edgebuilder-current-version-ds>"
+            -
+              name: "falkonry_tercel_process_spark_driver_memory"
+              value: "4g"
+            -
+              name: "falkonry_tercel_process_spark_executors"
+              value: "2"
+            -
+              name: "falkonry_tercel_process_spark_executor_core"
+              value: "5"
+            -
+              name: "falkonry_tercel_process_spark_executor_memory"
+              value: "20g"
+            -
+              name: "falkonry_tercel_process_spark_master"
+              value: "k8s://https://kubernetes.default:443"
+            -
+              name: "process_live_falkonry_edge_input_reader_no_data_timeout"
+              value: "1800000"
+            -
+              name: "falkonry_tercel_riactor_app_external_url"
+              value: "<data-services-external-url>"
+            -
+              name: "falkonry_kube_namespace"
+              valueFrom:
+                fieldRef:
+                  fieldPath: "metadata.namespace"
           livenessProbe:
-            httpGet:
-              path: /healthz
-              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            tcpSocket:
+              port: 8000
           readinessProbe:
-            httpGet:
-              path: /readyz
-              port: http
-          volumeMounts:
-          - name: data
-            mountPath: /data
-          resources:
-{{ toYaml .Values.resources | indent 12 }}
-    {{- with .Values.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-      volumes:
-      - name: data
-        emptyDir: {}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            tcpSocket:
+              port: 8000
+      restartPolicy: "Always"

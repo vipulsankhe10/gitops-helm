@@ -1,0 +1,12 @@
+---
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: falkonry-release
+  namespace: default
+spec:
+  releaseName: falkonryrelease
+  chart:
+    git: git@github.com:vipulsankhe10/gitops-helm
+    path: charts/podinfo
+    ref: master
